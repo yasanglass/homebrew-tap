@@ -1,0 +1,75 @@
+name: Update casks
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-casks
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: macos-26
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@1f8e202ffddf94def7f42f6fa3a482e821489f9c # 2026.07.10.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update outdated casks
+        id: update
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          updated=false
+          casks=(
+            kepko-sample
+            orbit-compose-multiplatform-catalog
+          )
+
+          for cask in "${casks[@]}"; do
+            livecheck="$(brew livecheck --cask --newer-only --json "yasanglass/tap/${cask}")"
+            version="$(jq -r '.[0].version.latest // empty' <<<"${livecheck}")"
+
+            if [[ -z "${version}" ]]; then
+              echo "${cask} is up to date"
+              continue
+            fi
+
+            echo "Updating ${cask} to ${version}"
+            brew bump-cask-pr \
+              --write-only \
+              --version "${version}" \
+              "yasanglass/tap/${cask}"
+            updated=true
+          done
+
+          echo "updated=${updated}" >>"${GITHUB_OUTPUT}"
+
+      - name: Validate updated casks
+        if: steps.update.outputs.updated == 'true'
+        run: |
+          brew test-bot --only-tap-syntax
+          brew style yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+          brew audit --cask --online yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+          brew livecheck --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+          brew fetch --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+
+      - name: Commit and push updates
+        if: steps.update.outputs.updated == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/kepko-sample.rb Casks/orbit-compose-multiplatform-catalog.rb
+          git commit -m "Update Homebrew casks"
+          git push origin HEAD:main

@@ -1,0 +1,35 @@
+name: Homebrew tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@1f8e202ffddf94def7f42f6fa3a482e821489f9c # 2026.07.10.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check tap syntax
+        run: brew test-bot --only-tap-syntax
+
+      - name: Check cask style
+        run: brew style yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+
+      - name: Audit cask
+        run: brew audit --cask --online yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+
+      - name: Check latest release
+        run: brew livecheck --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+
+      - name: Verify artifact checksum
+        run: brew fetch --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
