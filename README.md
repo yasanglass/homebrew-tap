@@ -30,6 +30,12 @@ brew install --cask yasanglass/tap/orbit-compose-multiplatform-catalog
 brew install --cask yasanglass/tap/kepko-sample
 ```
 
+### [Toolkit sample app](https://github.com/yasanglass/toolkit)
+
+```sh
+brew install --cask yasanglass/tap/toolkit-sample
+```
+
 ## First launch
 
 These apps are currently ad-hoc signed and not notarized by Apple. macOS may require approval under System Settings -> Privacy & Security before the first launch.
