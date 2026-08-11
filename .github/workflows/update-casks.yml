@@ -32,6 +32,7 @@ jobs:
           casks=(
             kepko-sample
             orbit-compose-multiplatform-catalog
+            toolkit-sample
           )
 
           for cask in "${casks[@]}"; do
@@ -57,10 +58,10 @@ jobs:
         if: steps.update.outputs.updated == 'true'
         run: |
           brew test-bot --only-tap-syntax
-          brew style yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
-          brew audit --cask --online yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
-          brew livecheck --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
-          brew fetch --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog
+          brew style yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog yasanglass/tap/toolkit-sample
+          brew audit --cask --online yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog yasanglass/tap/toolkit-sample
+          brew livecheck --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog yasanglass/tap/toolkit-sample
+          brew fetch --cask yasanglass/tap/kepko-sample yasanglass/tap/orbit-compose-multiplatform-catalog yasanglass/tap/toolkit-sample
 
       - name: Commit and push updates
         if: steps.update.outputs.updated == 'true'
@@ -70,6 +71,6 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Casks/kepko-sample.rb Casks/orbit-compose-multiplatform-catalog.rb
+          git add Casks/kepko-sample.rb Casks/orbit-compose-multiplatform-catalog.rb Casks/toolkit-sample.rb
           git commit -m "Update Homebrew casks"
           git push origin HEAD:main
