@@ -1,6 +1,6 @@
 cask "toolkit-sample" do
-  version "1.7.19"
-  sha256 "dfa6b6430a4a4357148914c2cbd5f2bc50d7f071c3092110c3d1d869ecdfedbc"
+  version "1.7.20"
+  sha256 "05d5544b1b208878728aa4e8a319415549c3bbcbf6cc4a60fdb3a7d42a3e1c35"
 
   url "https://github.com/yasanglass/toolkit/releases/download/#{version}/toolkit-sample-macos-#{version}.dmg"
   name "Toolkit"
